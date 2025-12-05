@@ -27,6 +27,7 @@ create:
 		echo "Creating directory $(TARGET)"; \
 		mkdir -p "$(TARGET)"; \
 		printf '$(TEMPLATE)' > "$(TARGET)/$(TARGET).c"; \
+		touch "$(TARGET)/test.in"; \
 		echo "Created $(TARGET)/$(TARGET).c"; \
 	fi
 	@if [ ! -f "$(TARGET)/$(TARGET).c" ]; then \
