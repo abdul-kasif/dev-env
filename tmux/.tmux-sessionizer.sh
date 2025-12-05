@@ -82,6 +82,16 @@ manage_session() {
     # Set the default command to zsh for all windows in this session
     tmux set-option -t "$session_name" default-shell /bin/zsh
 
+    # Create a new windows
+    tmux new-window -n "terminal"
+
+    tmux new-window -n "nvim"
+
+    tmux new-window -n "scratch"
+
+    # Remove an existing windows
+    tmux kill-window -t "zsh"
+
     # Attach to the new session
     tmux attach-session -t "$session_name"
   fi
