@@ -57,7 +57,7 @@ bench:
 	@bash -c ' \
 		sum=0; min=0; max=0; count=0; \
 		for i in $$(seq 1 $(ITERATIONS)); do \
-			time_output=$$((/usr/bin/time -f "%U" $(TARGET)/$(TARGET) < $(INPUT) >/dev/null) 2>&1); \
+			time_output=$$((/usr/bin/time -f "%U" $(TARGET)/$(TARGET) < $(TARGET)/$(INPUT) >/dev/null) 2>&1); \
 			if [ $$count -eq 0 ]; then \
 				min=$$time_output; max=$$time_output; \
 			else \
@@ -86,9 +86,9 @@ mem:
 	cd $(TARGET) && gcc $(CFLAGS) $(TARGET).c -o $(TARGET)
 	@echo "Running Valgrind Massif..."
 	valgrind --tool=massif --massif-out-file=$(TARGET)/massif.out \
-		$(TARGET)/$(TARGET) < $(INPUT) >/dev/null
+		$(TARGET)/$(TARGET) < $(TARGET)/$(INPUT) >/dev/null
 	@echo "Memory profile saved to: $(TARGET)/massif.out"
-	@echo "Analyze with: ms_print $(TARGET)/massif.out"
+	ms_print $(TARGET)/massif.out
 
 # Clean build artifacts and memory profiles
 clean:
