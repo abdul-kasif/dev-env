@@ -23,20 +23,29 @@ TEMPLATE = \#include <stdio.h>\n\nint main(void) {\n    printf(\"Hello, World!\\
 
 # Create directory and file, then open in Neovim
 create:
-	mkdir -p $(TARGET)
-	printf '$(TEMPLATE)' > $(TARGET)/$(TARGET).c
-	cd $(TARGET) && nvim $(TARGET).c
+	@if [ ! -d "$(TARGET)" ]; then \
+		echo "Creating directory $(TARGET)"; \
+		mkdir -p "$(TARGET)"; \
+		printf '$(TEMPLATE)' > "$(TARGET)/$(TARGET).c"; \
+		echo "Created $(TARGET)/$(TARGET).c"; \
+	fi
+	@if [ ! -f "$(TARGET)/$(TARGET).c" ]; then \
+		printf '$(TEMPLATE)' > "$(TARGET)/$(TARGET).c"; \
+		echo "Created $(TARGET)/$(TARGET).c"; \
+	fi
+	cd "$(TARGET)" && nvim "$(TARGET).c"
 
-# Open existing file
+# Always open (create dir if needed, but don't overwrite code)
 open:
-	cd $(TARGET) && nvim $(TARGET).c
+	mkdir -p "$(TARGET)"
+	cd "$(TARGET)" && nvim "$(TARGET).c"
 
 # Compile and run (with optional input redirection)
 run:
 	cd $(TARGET) && gcc $(CFLAGS) $(TARGET).c -o $(TARGET)
 	cd $(TARGET) && ./$(TARGET) < $(INPUT)
 
-# 🔥 BENCHMARK: Time execution (real, user, sys)
+# BENCHMARK: Time execution (real, user, sys)
 # Usage: make bench TARGET=solution [INPUT=test.in] [ITERATIONS=1000]
 bench:
 	@echo "=== BENCHMARKING $(TARGET) ==="
@@ -45,16 +54,30 @@ bench:
 	@echo "Compiling with $(CFLAGS)..."
 	cd $(TARGET) && gcc $(CFLAGS) $(TARGET).c -o $(TARGET)
 	@echo "Running time test..."
-	@# Use /usr/bin/time for detailed timing (real, user, sys)
-	@# -p = portable format; repeat ITERATIONS times
-	@bash -c 'for i in $$(seq 1 $(ITERATIONS)); do \
-		/usr/bin/time -f "Run $$i: %E real, %U user, %S sys, %M KB max RSS" \
-		$(TARGET)/$(TARGET) < $(INPUT) >/dev/null 2>/dev/null; \
-	done'
-	@# Aggregate timing (optional: use awk to compute average)
+	@bash -c ' \
+		sum=0; min=0; max=0; count=0; \
+		for i in $$(seq 1 $(ITERATIONS)); do \
+			time_output=$$((/usr/bin/time -f "%U" $(TARGET)/$(TARGET) < $(INPUT) >/dev/null) 2>&1); \
+			if [ $$count -eq 0 ]; then \
+				min=$$time_output; max=$$time_output; \
+			else \
+				[ $$(echo "$$time_output < $$min" | bc -l) -eq 1 ] && min=$$time_output; \
+				[ $$(echo "$$time_output > $$max" | bc -l) -eq 1 ] && max=$$time_output; \
+			fi; \
+			sum=$$(echo "$$sum + $$time_output" | bc -l); \
+			count=$$(($$count + 1)); \
+		done; \
+		avg=$$(echo "scale=6; $$sum / $$count" | bc -l); \
+		echo ""; \
+		echo "BENCHMARK RESULTS ($(ITERATIONS) runs):"; \
+		echo "   Min: $$min seconds"; \
+		echo "   Max: $$max seconds"; \
+		echo "   Avg: $$avg seconds"; \
+		echo "   (Measured: user CPU time)"; \
+	'
 	@echo "=== BENCHMARK COMPLETE ==="
 
-# 🧠 MEMORY: Profile heap usage with Valgrind Massif
+# MEMORY: Profile heap usage with Valgrind Massif
 # Usage: make mem TARGET=solution [INPUT=test.in]
 # Output: massif.out.<pid> → analyze with `ms_print massif.out.*`
 mem:
