@@ -3,6 +3,7 @@
 
 int main() {
   int n;
+  int max = 0;
   if (scanf("%d", &n) != 1 || n <= 0) {
     fprintf(stderr, "Invalid input\n");
     return 1;
@@ -23,7 +24,13 @@ int main() {
     }
   }
 
-  printf("%d\n", arr[0]);
+  for (int i = 0; i < n; i++) {
+    if (arr[i] > max) {
+      max = arr[i];
+    }
+  }
+
+  printf("%d\n", max);
   free(arr);
   return 0;
 }
