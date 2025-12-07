@@ -1,9 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int findMax(int arr[], int n) {
+  int MAX = 0;
+  for (int i = 0; i < n; i++) {
+    if (arr[i] > MAX) {
+      MAX = arr[i];
+    }
+  }
+  return MAX;
+}
+
 int main() {
   int n;
-  int max = 0;
   if (scanf("%d", &n) != 1 || n <= 0) {
     fprintf(stderr, "Invalid input\n");
     return 1;
@@ -23,14 +32,7 @@ int main() {
       return 1;
     }
   }
-
-  for (int i = 0; i < n; i++) {
-    if (arr[i] > max) {
-      max = arr[i];
-    }
-  }
-
-  printf("%d\n", max);
+  printf("%d\n", findMax(arr, n));
   free(arr);
   return 0;
 }
