@@ -34,7 +34,6 @@ create:
 		printf '$(TEMPLATE)' > "$(TARGET)/$(TARGET).c"; \
 		echo "Created $(TARGET)/$(TARGET).c"; \
 	fi
-	cd "$(TARGET)" && nvim "$(TARGET).c"
 
 # Always open (create dir if needed, but don't overwrite code)
 open:
