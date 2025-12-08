@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 int findMax(int arr[], int n) {
-  int MAX = 0;
+  int MAX = arr[0];
   for (int i = 0; i < n; i++) {
     if (arr[i] > MAX) {
       MAX = arr[i];
