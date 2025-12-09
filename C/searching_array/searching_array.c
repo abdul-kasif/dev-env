@@ -1,14 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// find the first occurance of the element and return it
+// find the all occurance of the element and return the indices
 int linearSearch(const int *arr, int n, int x) {
+  int count = 0;
+  printf("indices: ");
   for (int i = 0; i < n; i++) {
     if (arr[i] == x) {
-      return i;
+      count++;
+      printf("%d ", i);
     }
   }
-  return -1;
+  printf("\n");
+  return count;
 }
 
 int main(void) {
@@ -32,7 +36,7 @@ int main(void) {
     }
   }
   int res = linearSearch(arr, n, x);
-  printf("result: %d\n", res);
+  printf("count: %d\n", res);
   free(arr);
   return 0;
 }
