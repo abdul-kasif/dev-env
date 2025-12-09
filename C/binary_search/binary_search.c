@@ -3,20 +3,17 @@
 
 int binarySearch(const int *arr, int n, int target) {
   int low = 0;
-  int high = n - 1;
-  int index = -1;
-  while (low <= high) {
+  int high = n;
+
+  while (low < high) {
     int mid = low + (high - low) / 2;
-    if (arr[mid] == target) {
-      index = mid;
-      high = mid - 1;
-    } else if (arr[mid] < target) {
+    if (arr[mid] < target) {
       low = mid + 1;
-    } else if (arr[mid] > target) {
-      high = mid - 1;
+    } else {
+      high = mid;
     }
   }
-  return index;
+  return low;
 }
 int main(void) {
   int n, target;
