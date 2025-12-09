@@ -1,18 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// find the all occurance of the element and return the indices
-int linearSearch(const int *arr, int n, int x) {
-  int count = 0;
-  printf("indices: ");
+// find the index of the closest element to the target
+int linearSearch(const int *arr, int n, int k) {
+  if (n == 1) {
+    return 0;
+  }
+  int diff = abs(arr[0] - k);
+  int index = 0;
   for (int i = 0; i < n; i++) {
-    if (arr[i] == x) {
-      count++;
-      printf("%d ", i);
+    int m = abs(arr[i] - k);
+    if (m < diff) {
+      diff = m;
+      index = i;
     }
   }
-  printf("\n");
-  return count;
+  return index;
 }
 
 int main(void) {
@@ -35,8 +38,10 @@ int main(void) {
       return 1;
     }
   }
+
   int res = linearSearch(arr, n, x);
-  printf("count: %d\n", res);
+  printf("result: %d\n", res);
+
   free(arr);
   return 0;
 }
