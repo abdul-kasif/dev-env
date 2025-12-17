@@ -1,7 +1,7 @@
 # Installing necessary packages
 sudo dnf update -y
 
-sudo dnf install -y zsh curl vim neovim git chromium 
+sudo dnf install -y zsh curl vim neovim git chromium fastfetch kdotool heaptrack 
 
 sudo dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
 
@@ -46,6 +46,18 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Rust analyzer installation
 rustup component add rust-analyzer
+
+# Required packages for tauri application
+sudo dnf check-update
+sudo dnf install webkit2gtk4.1-devel \
+  openssl-devel \
+  curl \
+  wget \
+  file \
+  libappindicator-gtk3-devel \
+  librsvg2-devel \
+  libxdo-devel
+sudo dnf group install "c-development"
 
 # ------------------------------------------------------------------------------------
 
