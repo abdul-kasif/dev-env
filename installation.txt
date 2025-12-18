@@ -1,7 +1,7 @@
 # Installing necessary packages
 sudo dnf update -y
 
-sudo dnf install -y zsh curl vim neovim git chromium fastfetch kdotool heaptrack 
+sudo dnf install -y zsh curl vim neovim git chromium fastfetch kdotool heaptrack htop 
 
 sudo dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
 
