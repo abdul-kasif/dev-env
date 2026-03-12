@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+sudo dnf install python3 python3-pip -y
+
+PYTHON_VERSION=$(python --version 2>&1)
+PIP_VERSION=$(pip --version 2>&1)
+
+echo "python version: $PYTHON_VERSION"
+echo "pip version: $PIP_VERSION"

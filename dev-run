@@ -29,5 +29,3 @@ else
         run_script "$app"
     done
 fi
-
-echo "Setup Completed"
