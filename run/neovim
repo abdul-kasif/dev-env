@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+sudo dnf install -y vim neovim fd ripgrep fzf
+
+NVIM_CONFIG="$HOME/.config/nvim"
+
+echo "Installing LazyVim....."
+
+git clone https://github.com/LazyVim/starter "$NVIM_CONFIG"
+
+rm -rf "$NVIM_CONFIG/.git"
+
+echo "Run nvim to complete the installation"
