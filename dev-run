@@ -4,28 +4,59 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUN_DIR="$SCRIPT_DIR/run"
-
-echo "Updating system packages..."
-sudo dnf update -y
-
 run_script() {
-    local script="$1"
 
-    if [ -f "$RUN_DIR/$script" ]; then
-        echo "Installing $script"
-        "$RUN_DIR/$script"
-    else
-        echo "$script script not found"
-    fi
+  echo "Updating system packages..."
+  sudo dnf update -y
+
+  local script="$1"
+
+  if [ -f "$RUN_DIR/$script" ]; then
+    echo "Installing $script"
+    "$RUN_DIR/$script"
+  else
+    echo "$script script not found"
+  fi
 }
 
+list_apps() {
+  local i=1
+  echo "Available applications:"
+  for script in "$RUN_DIR"/*; do
+    local name=$(basename "$script")
+    echo "$i. $name"
+    i=$((i + 1))
+  done
+
+  echo "For installation use: ./dev-run <application_name>"
+}
+
+show_help() {
+  echo "Fedora Dev Setup"
+  echo "Commands: "
+  echo "  './dev-run --list' - to list all the avaliable applications"
+  echo "  './dev-run <application_name' - to install the application"
+}
+
+# Handle --list option
+if [ "${1:-}" = "--list" ]; then
+  list_apps
+  exit 0
+fi
+
+# Handle --list option
+if [ "${1:-}" = "--help" ]; then
+  show_help
+  exit 0
+fi
+
 if [ $# -eq 0 ]; then
-    for script in "$RUN_DIR"/*; do
-        echo "Running $(basename "$script")"
-        "$script"
-    done
+  for script in "$RUN_DIR"/*; do
+    echo "Running $(basename "$script")"
+    "$script"
+  done
 else
-    for app in "$@"; do
-        run_script "$app"
-    done
+  for app in "$@"; do
+    run_script "$app"
+  done
 fi
