@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sudo dnf install -y git tldr
+sudo dnf install -y git
 
 GIT_VERSION=$(git --version 2>&1)
 

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+echo "1. Installing GIMP..."
+sudo dnf install -y gimp
+
+echo "2. Installing zoxide..."
+sudo dnf install -y zoxide
+echo 'eval "$(zoxide init zsh)"' >>~/.zshrc
+
+echo "3. Installing eza..."
+sudo dnf copr enable alternateved/eza
+sudo dnf install -y eza
+
+echo 'alias ls="eza"' >>~/.zshrc
+echo 'alias ll="eza -la"' >>~/.zshrc
+
+echo "4. Installing tldr"
+sudo dnf install -y tldr
+
+exec zsh
+
+echo "5. Installation Complete"
