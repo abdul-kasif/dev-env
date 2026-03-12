@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+echo "1. Removing any conflicting packages..."
+sudo dnf remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-selinux \
+                  docker-engine-selinux \
+                  docker-engine
+
+echo "2. Updating system packages..."
+sudo dnf update -y 
+
+echo "3. Installing Dependencies..."
+sudo dnf install -y dnf-plugins-core
+
+echo "4. Adding docker repository..."
+sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
+
+echo "5. Installing docker engine and docker compose plugin..."
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+echo "6. Starting docker service..."
+sudo systemctl start docker
+
+echo "7. Enabling docker service..."
+sudo systemctl enable docker
+
+echo "8. Adding current user to docker"
+sudo usermod -aG docker "$USER"
+
+echo "Installation completed"
+echo "Logout and Login to use docker"
+
+
+
