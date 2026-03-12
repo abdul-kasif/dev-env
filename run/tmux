@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+sudo dnf install -y zsh tmux
+
+CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../config" && pwd)"
+
+cp "$CONFIG_DIR/tmux.conf" "$HOME/.tmux.conf"
+cp "$CONFIG_DIR/tmux-sessionizer" "$HOME/.tmux-sessionizer"
+
+chmod +x "$HOME/.tmux-sessionizer"
+
+echo 'alias ts="~/.tmux-sessionizer"' >>~/.zshrc
+
+exec zsh
