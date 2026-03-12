@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+sudo dnf install -y git
+
+GIT_VERSION=$(git --version 2>&1)
+
+echo "git version: $GIT_VERSION"
+
+CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../config" && pwd)"
+
+cp "$CONFIG_DIR/gitconfig" "$HOME/.gitconfig"
+
+
+
