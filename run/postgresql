@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+sudo dnf install -y postgresql-server postgresql-contrib pgcli
+ 
+echo "1. Initializing the database..."
+sudo postgresql-setup --initdb
+
+echo "2. Starting postgresql service..."
+sudo systemctl start postgresql
+
+echo "3. Enabling postgresql service..."
+sudo systemctl enable postgresql
+
+echo "4. Creating User..."
+sudo -u postgres createuser --interactive
+
+echo "5. Installation Completed"
+
