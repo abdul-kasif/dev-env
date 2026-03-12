@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RUN_DIR="$SCRIPT_DIR/run"
+
+echo "Updating system packages..."
+sudo dnf update -y
+
+run_script() {
+    local script="$1"
+
+    if [ -f "$RUN_DIR/$script" ]; then
+        echo "Installing $script"
+        "$RUN_DIR/$script"
+    else
+        echo "$script script not found"
+    fi
+}
+
+if [ $# -eq 0 ]; then
+    for script in "$RUN_DIR"/*; do
+        echo "Running $(basename "$script")"
+        "$script"
+    done
+else
+    for app in "$@"; do
+        run_script "$app"
+    done
+fi
+
+echo "Setup Completed"
