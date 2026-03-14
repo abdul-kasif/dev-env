@@ -6,7 +6,7 @@ THEME_DIR="$HOME/.config/nvim/lua/plugins"
 
 mkdir -p "$THEME_DIR"
 
-cat <<EOF > "$THEME_DIR/onedark.lua"
+cat <<EOF >"$THEME_DIR/onedark.lua"
 return {
     "navarasu/onedark.nvim",
     priority = 1000,
@@ -53,6 +53,17 @@ return {
     }
     require('onedark').load()
     end
+}
+EOF
+
+cat <<EOF >"$THEME_DIR/neo-tree.lua"
+return {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = {
+        window = {
+            width = 30
+        },
+    },
 }
 EOF
 
