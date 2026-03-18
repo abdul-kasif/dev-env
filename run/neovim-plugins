@@ -67,4 +67,23 @@ return {
 }
 EOF
 
+cat <<EOF >"$THEME_DIR/undotree.lua"
+return {
+  "mbbill/undotree",
+  keys = {
+    {
+      "<leader>u",
+      "<cmd>UndotreeToggle<CR>",
+      desc = "Toggle Undotree",
+    },
+  },
+  config = function()
+    -- Optional: Add any specific setup options here if needed.
+    -- For example, you can set the window position:
+    vim.g.undotree_Position = "right"
+    -- Or set the window size:
+    vim.g.undotree_Shorten_Method = "cut"
+  end,
+}
+EOF
 echo "Run nvim to complete installation"
