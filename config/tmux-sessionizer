@@ -87,6 +87,8 @@ manage_session() {
 
     tmux new-window -n "nvim"
 
+    tmux new-window -n "nvim2"
+
     tmux new-window -n "scratch"
 
     # Remove an existing windows
