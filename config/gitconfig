@@ -3,3 +3,5 @@
 	name = abdul-kasif
 [init]
 	defaultBranch = main
+[core]
+	editor = nvim
