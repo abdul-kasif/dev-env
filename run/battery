@@ -1,0 +1,10 @@
+
+sudo dnf install kernel-devel dkms -y
+
+
+sudo dnf copr enable asan/acer-modules
+sudo dnf install akmod-acer-wmi-battery -y
+
+
+
+echo 1 | sudo tee /sys/bus/wmi/drivers/acer-wmi-battery/health_mode
