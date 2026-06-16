@@ -1,0 +1,91 @@
+Setup Linux Kernal Driver Development Guide.
+
+Step 0. Prerequisites (Run on host machine)
+
+  sudo dnf install @development-tools
+  sudo dnf install @virtualization
+  sudo dnf install libvirt-client virt-manager qemu-kvm kernel-devel kernel-headers
+  sudo systemctl enable --now libvirtd
+  sudo systemctl enable --now virtqemud.socket
+  sudo systemctl enable --now virtstoraged.socket
+  sudo systemctl enable --now virtnetworkd.socket
+  sudo usermod -aG libvirt akasif
+  newgrp libvirt
+
+Step 1. Create a permanent workspace on host machine
+
+  mkdir -p ~/Projects/kernel-dev/
+
+Step 2. Spin up the Fedora 44 Guest VM
+  
+  1. Open the vitual machine manager (virt-manager) from KDE Plasma.
+  2. Create a new virtual machine and install Fedora 44 everything using ISO.
+  3. Hardware Allocation:
+     CPU: 4 vCPUs
+     Memory: 4096 MB
+
+Step 3. Set Up the VirtIO-FS Shared Folder
+
+Before starting the VM, link host development folder to the guest:
+ 1. Open the VM details window in virt-manager.
+ 2. Click Add Hardware -> Select Filesystem.
+ 3. Configure it exactly like this:
+    Driver: virtiofs
+    Source Path: /home/akasif/projects/kernel-dev
+    Target Mount Tag: kernel_shared_host
+ 4. Click Finish and boot Guest VM.
+
+Step 4. Configure the Guest VM
+
+Log into Guest VM, open its terminal, and configure the system headers and the RAM disk.
+ 1. Install kernel headers
+    sudo dnf install kernel-devel kernel-headers gcc make
+ 2. Creating the mounting targets.
+    mkdir -p ~/host-workspace
+    mkdir -p ~/ram-build
+ 3. Automate mount on boot.
+    Open the guest file system configuration table:
+      sudo nano /etc/fstab
+    Append these two lines to the very bottom of the file
+      kernel_shared_host  /home/your_vm_user/host-workspace  virtiofs  defaults  0  0
+      tmpfs               /home/your_vm_user/ram-build       tmpfs     size=512M   0  0
+ 4. Apply mounts instantly 
+    sudo mount -a
+ 5. verify the mount 
+    df -h
+
+Step 5. Development Loop
+
+Inside your Host folder (~/projects/kernel-dev), write module files (e.g., hello.c, Makefile).
+Then, inside Guest VM, create a script named build-module.sh in your home directory:
+
+script: 
+
+#!/bin/bash
+# 1. Clear out previous RAM builds cleanly
+find ~/ram-build -mindepth 1 -delete
+
+# 2. Copy code from host SSD storage directly to GUEST VM RAM
+rsync -a --delete ~/host-workspace/ ~/ram-build/
+cd ~/ram-build
+
+# 3. Complies inside the RAM disk
+echo "--- Compiling Module in RAM ---"
+make -j$(nproc)
+
+# 4. Prompt to test if compliation succeeds
+if [ $? -eq 0 ]; then
+        echo "Compilation successful!"
+        read -p "Do you want to insert the module? (y/n): " choice
+        if [ "$choice" = "y" ]; then
+                MODULE=$(basename *.ko .ko)
+                sudo insmod "$MODULE.ko"
+                sudo dmesg | tail -n 10
+                echo "-----------------------"
+                read -p "Press Enter to remove the module.."
+                sudo rmmod "$MODULE"
+                echo "Module removed safely."
+        fi
+fi
+
+chmod +x ~/build-module.sh
