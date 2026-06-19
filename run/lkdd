@@ -60,32 +60,69 @@ Inside your Host folder (~/projects/kernel-dev), write module files (e.g., hello
 Then, inside Guest VM, create a script named build-module.sh in your home directory:
 
 script: 
-
 #!/bin/bash
-# 1. Clear out previous RAM builds cleanly
-find ~/ram-build -mindepth 1 -delete
 
-# 2. Copy code from host SSD storage directly to GUEST VM RAM
-rsync -a --delete ~/host-workspace/ ~/ram-build/
-cd ~/ram-build
-
-# 3. Complies inside the RAM disk
-echo "--- Compiling Module in RAM ---"
-make -j$(nproc)
-
-# 4. Prompt to test if compliation succeeds
-if [ $? -eq 0 ]; then
-        echo "Compilation successful!"
-        read -p "Do you want to insert the module? (y/n): " choice
-        if [ "$choice" = "y" ]; then
-                MODULE=$(basename *.ko .ko)
-                sudo insmod "$MODULE.ko"
-                sudo dmesg | tail -n 10
-                echo "-----------------------"
-                read -p "Press Enter to remove the module.."
-                sudo rmmod "$MODULE"
-                echo "Module removed safely."
-        fi
+# 1. Input Validation
+if [ -z "$1" ]; then
+  echo "Error: No project folder specified."
+  echo "Usage: ./build.sh <folder_name>"
+  exit 1
 fi
+
+PROJECT_DIR="$1"
+SOURCE_PATH=~/host-workspace/"$PROJECT_DIR"
+
+# Ensure the specified project folder actually exists in the shared drive
+if [ ! -d "$SOURCE_PATH" ]; then
+  echo "Error: Project directory '$SOURCE_PATH' does not exist!"
+  exit 1
+fi
+
+# 2. Sync code from the specific project folder to the RAM disk cleanly
+echo "--- Syncing '$PROJECT_DIR' to RAM ---"
+rsync -rlt --delete "$SOURCE_PATH"/ ~/ram-build/
+echo -e " Syncing completed! \n"
+
+# 3. Enter the RAM disk safely
+cd ~/ram-build || {
+  echo "Failed to enter RAM build directory"
+  exit 1
+}
+
+# 4. Compile inside the RAM disk
+echo "--- Compiling '$PROJECT_DIR' Module in RAM ---"
+make -j"$(nproc)"
+
+# 5. Handle Compilation Results
+if [ $? -eq 0 ]; then
+  echo -e "\n Compilation successful!"
+  read -p "Do you want to insert the module? (y/n): " choice
+
+  if [ "$choice" = "y" ]; then
+    # Find the .ko file safely
+    KO_FILE=$(ls *.ko 2>/dev/null | head -n 1)
+
+    if [ -z "$KO_FILE" ]; then
+      echo "Error: No .ko file found after compilation!"
+      exit 1
+    fi
+
+    MODULE=$(basename "$KO_FILE" .ko)
+
+    echo "Inserting $KO_FILE..."
+    sudo insmod "$KO_FILE"
+
+    echo "--- Kernel Logs ---"
+    sudo dmesg | tail -n 10
+    echo "-----------------------"
+
+    read -p "Press Enter to remove the module..."
+    sudo rmmod "$MODULE"
+    echo "Module '$MODULE' removed safely."
+  fi
+else
+  echo -e "\n Compilation failed! Check the errors above."
+fi
+
 
 chmod +x ~/build-module.sh
