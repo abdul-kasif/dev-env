@@ -14,7 +14,7 @@ Step 0. Prerequisites (Run on host machine)
 
 Step 1. Create a permanent workspace on host machine
 
-  mkdir -p ~/Projects/kernel-dev/
+  mkdir -p ~/Workspace/linux-driver-sandbox
 
 Step 2. Spin up the Fedora 44 Guest VM
   
@@ -31,7 +31,7 @@ Before starting the VM, link host development folder to the guest:
  2. Click Add Hardware -> Select Filesystem.
  3. Configure it exactly like this:
     Driver: virtiofs
-    Source Path: /home/akasif/projects/kernel-dev
+    Source Path: /home/<host_username>/Workspace/linux-driver-sandbox
     Target Mount Tag: kernel_shared_host
  4. Click Finish and boot Guest VM.
 
@@ -39,7 +39,7 @@ Step 4. Configure the Guest VM
 
 Log into Guest VM, open its terminal, and configure the system headers and the RAM disk.
  1. Install kernel headers
-    sudo dnf install kernel-devel kernel-headers gcc make
+    sudo dnf install kernel-devel kernel-headers gcc make rsync 
  2. Creating the mounting targets.
     mkdir -p ~/host-workspace
     mkdir -p ~/ram-build
@@ -48,7 +48,7 @@ Log into Guest VM, open its terminal, and configure the system headers and the R
       sudo nano /etc/fstab
     Append these two lines to the very bottom of the file
       kernel_shared_host  /home/your_vm_user/host-workspace  virtiofs  defaults  0  0
-      tmpfs               /home/your_vm_user/ram-build       tmpfs     size=512M   0  0
+      tmpfs               /home/your_vm_user/ram-build       tmpfs     size=512M,uid=1000,gid=1000   0  0
  4. Apply mounts instantly 
     sudo mount -a
  5. verify the mount 
