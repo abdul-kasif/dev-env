@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+sudo dnf install golang -y
+
+GO_VERSION=$(go version 2>&1)
+
+echo "go version: $GO_VERSION"
