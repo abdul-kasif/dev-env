@@ -76,23 +76,40 @@ manage_session() {
   else
     echo "Creating new session '$session_name' with zsh..."
 
-    # Create new session with zsh as default shell
-    tmux new-session -d -s "$session_name" -c "$HOME" -e SHELL=/bin/zsh
+    # Create new session with zsh as default shell, naming the first window "terminal"
+    tmux new-session -d -s "$session_name" -n "terminal" -c "$HOME" -e SHELL=/bin/zsh
 
     # Set the default command to zsh for all windows in this session
     tmux set-option -t "$session_name" default-shell /bin/zsh
 
-    # Create a new windows
-    tmux new-window -n "terminal"
+    # Determine if a mamba environment matches the session name
+    local mamba_cmd=""
+    if [ -d "$HOME/.miniforge3/envs/$session_name" ]; then
+      mamba_cmd="mamba activate $session_name && clear"
+    fi
 
-    tmux new-window -n "nvim"
+    # Window: terminal (created by new-session)
+    if [ -n "$mamba_cmd" ]; then
+      tmux send-keys -t "$session_name:terminal" "$mamba_cmd" C-m
+    fi
 
-    tmux new-window -n "nvim2"
+    # Window: nvim
+    tmux new-window -t "$session_name" -n "nvim"
+    if [ -n "$mamba_cmd" ]; then
+      tmux send-keys -t "$session_name:nvim" "$mamba_cmd" C-m
+    fi
 
-    tmux new-window -n "scratch"
+    # Window: nvim2
+    tmux new-window -t "$session_name" -n "nvim2"
+    if [ -n "$mamba_cmd" ]; then
+      tmux send-keys -t "$session_name:nvim2" "$mamba_cmd" C-m
+    fi
 
-    # Remove an existing windows
-    tmux kill-window -t "zsh"
+    # Window: scratch
+    tmux new-window -t "$session_name" -n "scratch"
+    if [ -n "$mamba_cmd" ]; then
+      tmux send-keys -t "$session_name:scratch" "$mamba_cmd" C-m
+    fi
 
     # Attach to the new session
     tmux attach-session -t "$session_name"
